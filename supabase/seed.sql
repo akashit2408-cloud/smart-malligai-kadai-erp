@@ -1,0 +1,46 @@
+-- Smart Malligai Kadai ERP - Seed Data (Optional)
+-- Run this after creating your store owner account to populate common data.
+-- Replace 'your-store-uuid' with the actual store_id.
+
+-- Example: Insert common categories for your store
+-- INSERT INTO public.categories (store_id, name, description)
+-- VALUES
+--   ('your-store-uuid', 'Rice & Grains', 'Rice, wheat, pulses, and lentils'),
+--   ('your-store-uuid', 'Spices', 'Masala, spices, and seasonings'),
+--   ('your-store-uuid', 'Oil & Ghee', 'Cooking oils and ghee'),
+--   ('your-store-uuid', 'Snacks', 'Biscuits, chips, and namkeen'),
+--   ('your-store-uuid', 'Beverages', 'Tea, coffee, soft drinks, and juices'),
+--   ('your-store-uuid', 'Dairy', 'Milk, curd, butter, and cheese'),
+--   ('your-store-uuid', 'Cleaning', 'Detergents, soaps, and cleaning supplies'),
+--   ('your-store-uuid', 'Personal Care', 'Shampoo, soap, toothpaste, etc.'),
+--   ('your-store-uuid', 'Stationery', 'Notebooks, pens, and daily essentials'),
+--   ('your-store-uuid', 'Miscellaneous', 'Other items');
+
+-- Example: Insert common units
+-- INSERT INTO public.units (store_id, name, abbreviation)
+-- VALUES
+--   ('your-store-uuid', 'Kilogram', 'kg'),
+--   ('your-store-uuid', 'Gram', 'g'),
+--   ('your-store-uuid', 'Litre', 'L'),
+--   ('your-store-uuid', 'Millilitre', 'ml'),
+--   ('your-store-uuid', 'Piece', 'pc'),
+--   ('your-store-uuid', 'Packet', 'pkt'),
+--   ('your-store-uuid', 'Box', 'box'),
+--   ('your-store-uuid', 'Dozen', 'dz');
+
+-- Example: Insert sample products
+-- INSERT INTO public.products (store_id, name, category_id, unit_id, cost_price, selling_price, gst_rate, min_stock_level)
+-- SELECT
+--   'your-store-uuid',
+--   'Sample Rice 1kg',
+--   c.id,
+--   u.id,
+--   50,
+--   65,
+--   5,
+--   10
+-- FROM public.categories c, public.units u
+-- WHERE c.store_id = 'your-store-uuid' AND c.name = 'Rice & Grains'
+--   AND u.store_id = 'your-store-uuid' AND u.abbreviation = 'kg';
+
+-- To enable demo mode, set environment variable SEED_DEMO_DATA=true in your app.
