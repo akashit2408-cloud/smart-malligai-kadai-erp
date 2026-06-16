@@ -68,6 +68,21 @@ CREATE POLICY "Store owners can manage their stores" ON public.stores
   FOR ALL USING (owner_id = auth.uid());
 
 ------------------------------------------------------------
+-- Security Definer Function for RLS
+------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.user_store_ids()
+RETURNS SETOF uuid
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT id FROM public.stores WHERE owner_id = auth.uid()
+  UNION
+  SELECT store_id FROM public.profiles WHERE id = auth.uid() AND store_id IS NOT NULL;
+$$;
+
+------------------------------------------------------------
 -- Categories
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.categories (
@@ -80,10 +95,7 @@ CREATE TABLE IF NOT EXISTS public.categories (
 
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Store scoped categories" ON public.categories
-  FOR ALL USING (
-    store_id IN (SELECT id FROM public.stores WHERE owner_id = auth.uid())
-    OR store_id IN (SELECT store_id FROM public.profiles WHERE id = auth.uid() AND store_id IS NOT NULL)
-  );
+  FOR ALL USING (store_id IN (SELECT public.user_store_ids()));
 
 ------------------------------------------------------------
 -- Brands
@@ -97,10 +109,7 @@ CREATE TABLE IF NOT EXISTS public.brands (
 
 ALTER TABLE public.brands ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Store scoped brands" ON public.brands
-  FOR ALL USING (
-    store_id IN (SELECT id FROM public.stores WHERE owner_id = auth.uid())
-    OR store_id IN (SELECT store_id FROM public.profiles WHERE id = auth.uid() AND store_id IS NOT NULL)
-  );
+  FOR ALL USING (store_id IN (SELECT public.user_store_ids()));
 
 ------------------------------------------------------------
 -- Units
@@ -115,10 +124,7 @@ CREATE TABLE IF NOT EXISTS public.units (
 
 ALTER TABLE public.units ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Store scoped units" ON public.units
-  FOR ALL USING (
-    store_id IN (SELECT id FROM public.stores WHERE owner_id = auth.uid())
-    OR store_id IN (SELECT store_id FROM public.profiles WHERE id = auth.uid() AND store_id IS NOT NULL)
-  );
+  FOR ALL USING (store_id IN (SELECT public.user_store_ids()));
 
 ------------------------------------------------------------
 -- Products
@@ -146,10 +152,7 @@ CREATE TABLE IF NOT EXISTS public.products (
 
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Store scoped products" ON public.products
-  FOR ALL USING (
-    store_id IN (SELECT id FROM public.stores WHERE owner_id = auth.uid())
-    OR store_id IN (SELECT store_id FROM public.profiles WHERE id = auth.uid() AND store_id IS NOT NULL)
-  );
+  FOR ALL USING (store_id IN (SELECT public.user_store_ids()));
 
 CREATE INDEX idx_products_store_id ON public.products(store_id);
 CREATE INDEX idx_products_barcode ON public.products(barcode);
@@ -173,10 +176,7 @@ CREATE TABLE IF NOT EXISTS public.inventory (
 
 ALTER TABLE public.inventory ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Store scoped inventory" ON public.inventory
-  FOR ALL USING (
-    store_id IN (SELECT id FROM public.stores WHERE owner_id = auth.uid())
-    OR store_id IN (SELECT store_id FROM public.profiles WHERE id = auth.uid() AND store_id IS NOT NULL)
-  );
+  FOR ALL USING (store_id IN (SELECT public.user_store_ids()));
 
 CREATE INDEX idx_inventory_product ON public.inventory(product_id);
 CREATE INDEX idx_inventory_expiry ON public.inventory(expiry_date);
@@ -199,10 +199,7 @@ CREATE TABLE IF NOT EXISTS public.inventory_movements (
 
 ALTER TABLE public.inventory_movements ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Store scoped inventory movements" ON public.inventory_movements
-  FOR ALL USING (
-    store_id IN (SELECT id FROM public.stores WHERE owner_id = auth.uid())
-    OR store_id IN (SELECT store_id FROM public.profiles WHERE id = auth.uid() AND store_id IS NOT NULL)
-  );
+  FOR ALL USING (store_id IN (SELECT public.user_store_ids()));
 
 CREATE INDEX idx_inv_movements_product ON public.inventory_movements(product_id);
 CREATE INDEX idx_inv_movements_store ON public.inventory_movements(store_id);
