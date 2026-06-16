@@ -43,6 +43,9 @@ export default function InventoryPage() {
 
   const addProduct = useMutation({
     mutationFn: async (product: NewProductPayload) => {
+      if (!product.store_id) {
+        throw new Error('Store ID is missing. You must belong to a store to add products.');
+      }
       const { initial_stock, ...productData } = product;
       const { data: newProduct, error } = await supabase
         .from('products')
@@ -86,7 +89,7 @@ export default function InventoryPage() {
           <h1 className="text-2xl font-bold">Inventory</h1>
           <p className="text-muted-foreground">Manage your products and stock</p>
         </div>
-        <Button onClick={() => setShowForm(!showForm)}>
+        <Button onClick={() => setShowForm(!showForm)} disabled={!storeId}>
           <Plus className="mr-2 h-4 w-4" />
           Add Product
         </Button>
