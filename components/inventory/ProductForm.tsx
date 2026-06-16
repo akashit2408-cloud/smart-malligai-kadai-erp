@@ -2,6 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'react-hot-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,8 +26,12 @@ export function ProductForm({ storeId, onSubmit, onCancel, isSubmitting }: Produ
   } = useForm<ProductInput>({
     resolver: zodResolver(productSchema),
     defaultValues: {
+      name: '',
+      barcode: '',
+      description: '',
       cost_price: 0,
       selling_price: 0,
+      mrp: 0,
       gst_rate: 0,
       min_stock_level: 0,
       initial_stock: 0,
@@ -40,13 +45,17 @@ export function ProductForm({ storeId, onSubmit, onCancel, isSubmitting }: Produ
     });
   };
 
+  const handleFormError = () => {
+    toast.error('Please check the form for validation errors');
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Add New Product</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit(handleFormSubmit, handleFormError)} className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="name">Product Name</Label>
             <Input id="name" {...register('name')} />

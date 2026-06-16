@@ -14,6 +14,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { formatCurrency } from '@/lib/utils';
 import { Product } from '@/types';
 import { ProductInput } from '@/lib/validations/product';
+import { toast } from 'react-hot-toast';
 
 type NewProductPayload = ProductInput & { store_id: string };
 
@@ -71,6 +72,10 @@ export default function InventoryPage() {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['inventory'] });
       setShowForm(false);
+      toast.success('Product added successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to add product');
     },
   });
 
